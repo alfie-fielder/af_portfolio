@@ -56,7 +56,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-
+      
+      - name: Configure Git for private modules
+        run: |
+          git config --global url."https://oauth2:${{ secrets.GITHUB_TOKEN }}".insteadOf "https://github.com"
+          
       - name: Terraform Format Check
         id: fmt
         run: terraform fmt -check -recursive
