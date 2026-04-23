@@ -58,8 +58,10 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
       
       - name: Configure Git for private modules
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global url."https://oauth2:${{ secrets.GITHUB_TOKEN }}".insteadOf "https://github.com"
+          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
           
       - name: Terraform Format Check
         id: fmt
