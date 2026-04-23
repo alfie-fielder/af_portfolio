@@ -14,9 +14,32 @@ env:
   TF_VERSION: "1.7.0"
 
 jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      directories: ${{ steps.find-dirs.outputs.directories }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Find all Terraform directories
+        id: find-dirs
+        run: |
+          DIRS=$(find . -name "*.tf" -not -path "*/.terraform/*" \
+            | xargs -I {} dirname {} \
+            | sort -u \
+            | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "directories=$DIRS" >> $GITHUB_OUTPUT
+
   apply:
+    needs: discover
+    if: needs.discover.outputs.directories != '[]'
     runs-on: ubuntu-latest
     environment: production
+    strategy:
+      matrix:
+        directory: ${{ fromJson(needs.discover.outputs.directories) }}
+      fail-fast: false
 
     steps:
       - name: Checkout
@@ -35,6 +58,8 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ${{ matrix.directory }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        working-directory: ${{ matrix.directory }}
