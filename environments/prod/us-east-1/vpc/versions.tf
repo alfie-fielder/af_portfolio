@@ -7,10 +7,4 @@ terraform {
       version = ">= 5.0"
     }
   }
-
-  backend "s3" {
-    bucket = "af-portfolio-tfstate"
-    key    = "environments/prod/us-east-1/vpc/terraform.tfstate"
-    region = "us-east-1"
-  }
 }

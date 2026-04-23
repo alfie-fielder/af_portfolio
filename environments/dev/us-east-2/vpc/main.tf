@@ -1,22 +1,18 @@
 provider "aws" {
-  region = "us-east-2"
+  region = var.aws_region
 }
 
 module "vpc" {
   source = "github.com/alfie-fielder/af_portfolio_vpc_module?ref=v2.0.0"
 
-  vpc_name           = "af-portfolio-dev-use2"
-  vpc_cidr_block     = "10.3.0.0/16"
-  aws_region         = "us-east-2"
-  availability_zones = ["us-east-2a", "us-east-2b"]
-  subnet_cidrs       = ["10.3.1.0/24", "10.3.2.0/24"]
-  tgw_subnet_cidrs   = ["10.3.0.0/28", "10.3.0.16/28"]
-  flow_logs_enabled  = false
-
-  tags = {
-    Environment = "dev"
-    Region      = "us-east-2"
-    ManagedBy   = "terraform"
-    Project     = "af-portfolio"
-  }
+  vpc_name              = var.vpc_name
+  vpc_cidr_block        = var.vpc_cidr_block
+  aws_region            = var.aws_region
+  availability_zones    = var.availability_zones
+  subnet_cidrs          = var.subnet_cidrs
+  tgw_subnet_cidrs      = var.tgw_subnet_cidrs
+  flow_logs_enabled     = var.flow_logs_enabled
+  flow_log_bucket_arn   = var.flow_log_bucket_arn
+  flow_log_iam_role_arn = var.flow_log_iam_role_arn
+  tags                  = var.tags
 }
