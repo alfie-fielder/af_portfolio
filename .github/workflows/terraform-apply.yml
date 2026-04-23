@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 env:
-  TF_VERSION: "1.7.0"
+  TF_VERSION: "1.9.0"
 
 jobs:
   discover:
