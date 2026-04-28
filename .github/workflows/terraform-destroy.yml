@@ -1,0 +1,55 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to destroy (e.g. dev, prod)"
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+      confirm:
+        description: "Type DESTROY to confirm"
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_VERSION: "1.9.0"
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment: production
+    if: ${{ github.event.inputs.confirm == 'DESTROY' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Find and destroy Terraform roots
+        run: |
+          ENV=${{ github.event.inputs.environment }}
+          
+          find environments/${ENV} -name "main.tf" | while read tf_file; do
+            DIR=$(dirname $tf_file)
+            echo "==> Destroying: $DIR"
+            cd $GITHUB_WORKSPACE/$DIR
+            terraform init
+            terraform destroy -auto-approve
+          done
