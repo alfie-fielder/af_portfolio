@@ -1,5 +1,5 @@
 module "dc" {
-  source = "git::https://github.com/alfie-fielder/af_portfolio_ec2_module.git?ref=v1.1.1"
+  source = "git::https://github.com/alfie-fielder/af_portfolio_ec2_module.git?ref=v2.0.0"
 
   ami           = var.ami
   instance_type = var.instance_type
