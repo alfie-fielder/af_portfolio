@@ -12,3 +12,34 @@ resource "helm_release" "argocd" {
    })
   ]
 }
+
+resource "kubernetes_manifest" "argocd_root_app" {
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "Application"
+    metadata = {
+      name      = "root-app"
+      namespace = "argocd"
+    }
+    spec = {
+      project = "default"
+      source = {
+        repoURL        = "https://github.com/alfie-fielder/af_portfolio_platform"
+        targetRevision = "HEAD"
+        path           = "platform-apps"
+      }
+      destination = {
+        server    = "https://kubernetes.default.svc"
+        namespace = "argocd"
+      }
+      syncPolicy = {
+        automated = {
+          prune    = true
+          selfHeal = true
+        }
+      }
+    }
+  }
+
+  depends_on = [helm_release.argocd]
+}
